@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html ng-app="workspace">
+
+<head>
+    <meta charset="utf-8">
+</head>
+
+<body>
+    <button id="startScan">스캔시작</button>
+    <button id="stopScan">스캔종료</button>
+    <script type="text/javascript">
+    const {
+        ipcRenderer
+    } = require('electron');
+
+    document.querySelector('#startScan').addEventListener('click', function() {
+        // ipcRenderer.send('startScan');
+        console.log('battery_service');
+        navigator.bluetooth.requestDevice({
+                filters: [{
+                    name: ['KocoaFab_BLE']
+                    // services: ['battery_service']
+                }],
+                acceptAllDevices:true,
+                optionalServices: ['generic_access']
+            })
+            .then(device => {
+                console.log(device);
+                console.log('getPrimaryServices');
+                window.a = device;
+                device.gatt.getPrimaryService("00001800-0000-1000-8000-00805f9b34fb").then(a => {console.log(a)})
+                return device.gatt.connect();
+            })
+            .then(s => {
+                console.log(s);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    });
+    document.querySelector('#stopScan').addEventListener('click', function() {
+        ipcRenderer.send('stopScan');
+    });
+    </script>
+</body>
+
+</html>
